@@ -6,7 +6,7 @@
 
 ```bash
 pip3 install requests --user
-python3 Download.py AC05 1 276
+python3 Download.py
 ```
 
 ## 感谢
