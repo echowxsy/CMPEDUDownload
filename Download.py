@@ -79,6 +79,10 @@ def genPDFUrl(imgUrl):
 
 
 def downloadPdf(filename, url):
+    if os.path.exists(filename):
+        print("[LOG] file exists: %s" % (filename))
+        return
+        
     headers = {
         'Sec-Fetch-Mode': 'cors',
         'Sec-Fetch-Site': 'same-origin',
@@ -106,35 +110,31 @@ def downloadPdf(filename, url):
         mtd_list = []
         start = 0
         end = -1
+        # 请空并生成文件
+        tempf = open(filename, 'w')
+        tempf.close()
+        # rb+ ，二进制打开，可任意位置读写
+        with open(filename, 'rb+') as f:
+            fileno = f.fileno()
+            # 如果文件大小为11字节，那就是获取文件0-10的位置的数据。如果end = 10，说明数据已经获取完了。
+            while end < filesize - 1:
+                start = end + 1
+                end = start + step - 1
+                if end > filesize:
+                    end = filesize
+                # print("start:%s, end:%s"%(start,end))
+                # 复制文件句柄
+                dup = os.dup(fileno)
+                # print(dup)
+                # 打开文件
+                fd = os.fdopen(dup, 'rb+', -1)
+                # print(fd)
+                t = MulThreadDownload(url, start, end, fd)
+                t.start()
+                mtd_list.append(t)
 
-        if os.path.exists(filename):
-            pass
-        else:
-            # 请空并生成文件
-            tempf = open(filename, 'w')
-            tempf.close()
-            # rb+ ，二进制打开，可任意位置读写
-            with open(filename, 'rb+') as f:
-                fileno = f.fileno()
-                # 如果文件大小为11字节，那就是获取文件0-10的位置的数据。如果end = 10，说明数据已经获取完了。
-                while end < filesize - 1:
-                    start = end + 1
-                    end = start + step - 1
-                    if end > filesize:
-                        end = filesize
-                    # print("start:%s, end:%s"%(start,end))
-                    # 复制文件句柄
-                    dup = os.dup(fileno)
-                    # print(dup)
-                    # 打开文件
-                    fd = os.fdopen(dup, 'rb+', -1)
-                    # print(fd)
-                    t = MulThreadDownload(url, start, end, fd)
-                    t.start()
-                    mtd_list.append(t)
-
-                for i in mtd_list:
-                    i.join()
+            for i in mtd_list:
+                i.join()
 
 
 def cleanFileName(filename):
