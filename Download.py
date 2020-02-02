@@ -132,17 +132,21 @@ def downloadPdf(filename, url):
             for i in mtd_list:
                 i.join()
 
+
 if __name__ == "__main__":
-  category = sys.argv[1]
-  page = sys.argv[2]
-  limit = sys.argv[3]
-  # print(category,page,limit) 
-  bookCategoryInfo = getBookCategoryInfo(category,page,limit)
-  print("Category %s count is: %s" % (category,bookCategoryInfo["otherResult"]["count"]))
-  bookList = bookCategoryInfo['module']
-  for bookInfo in bookList:
-      if isCmpebooks(bookInfo['img']):
-          pdfUrl = genPDFUrl(bookInfo['img'])
-          pdfName = bookInfo['name']+".pdf"
-          print('Download:', pdfName)
-          downloadPdf(pdfName, pdfUrl)
+    category = sys.argv[1]
+    page = sys.argv[2]
+    limit = sys.argv[3]
+    bookCategoryInfo = getBookCategoryInfo(category, page, limit)
+    print("Category %s count is: %s" %
+          (category, bookCategoryInfo["otherResult"]["count"]))
+    bookList = bookCategoryInfo['module']
+    if not os.path.exists('downloads/'+category):
+        os.makedirs('downloads/'+category)
+    os.chdir('downloads/'+category)
+    for bookInfo in bookList:
+        if isCmpebooks(bookInfo['img']):
+            pdfUrl = genPDFUrl(bookInfo['img'])
+            pdfName = bookInfo['name']+".pdf"
+            print('Download:', pdfName)
+            downloadPdf(pdfName, pdfUrl)
