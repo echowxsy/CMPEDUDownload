@@ -4,6 +4,8 @@ import json
 
 import requests
 
+referer = "https://cmpebooks.s3.cn-north-1.amazonaws.com.cn/pdfReader/generic/build/pdf.worker.js"
+
 
 def get_books(code: str):
     response = requests.post(
@@ -38,7 +40,7 @@ def main():
     for category_code, category_name in catgories.items():
         for pdf_link, filename in get_books(category_code):
             saved_path = "downloads/%s-%s/%s" % (category_code, category_name, filename)
-            print("%s\n\tout=%s" % (pdf_link, saved_path))
+            print("%s\n\treferer=%s\n\tout=%s" % (pdf_link, referer, saved_path))
 
 
 if __name__ == "__main__":
