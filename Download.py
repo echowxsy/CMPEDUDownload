@@ -133,6 +133,10 @@ def downloadPdf(filename, url):
                 i.join()
 
 
+def cleanFileName(filename):
+    return filename.replace('/', '')
+
+
 if __name__ == "__main__":
     category = sys.argv[1]
     page = sys.argv[2]
@@ -147,6 +151,6 @@ if __name__ == "__main__":
     for bookInfo in bookList:
         if isCmpebooks(bookInfo['img']):
             pdfUrl = genPDFUrl(bookInfo['img'])
-            pdfName = bookInfo['name']+".pdf"
+            pdfName = cleanFileName(bookInfo['name']+".pdf")
             print('Download:', pdfName)
             downloadPdf(pdfName, pdfUrl)
