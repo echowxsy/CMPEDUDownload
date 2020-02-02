@@ -136,7 +136,7 @@ if __name__ == "__main__":
   category = sys.argv[1]
   page = sys.argv[2]
   limit = sys.argv[3]
-  print(category,page,limit) 
+  # print(category,page,limit) 
   bookCategoryInfo = getBookCategoryInfo(category,page,limit)
   print("Category %s count is: %s" % (category,bookCategoryInfo["otherResult"]["count"]))
   bookList = bookCategoryInfo['module']
