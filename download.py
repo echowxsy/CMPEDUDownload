@@ -35,7 +35,7 @@ def get_books(code: str):
 
 def main():
     catgories = {}
-    with open("categories.json") as fp:
+    with open("categories.json",encoding='utf-8') as fp:
         catgories = json.load(fp)
     for category_code, category_name in catgories.items():
         if category_code[0] == "#":
