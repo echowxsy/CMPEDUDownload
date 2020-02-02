@@ -134,23 +134,32 @@ def downloadPdf(filename, url):
 
 
 def cleanFileName(filename):
-    return filename.replace('/', '')
+    return filename.replace('/', ' ')
 
 
 if __name__ == "__main__":
-    category = sys.argv[1]
-    page = sys.argv[2]
-    limit = sys.argv[3]
-    bookCategoryInfo = getBookCategoryInfo(category, page, limit)
-    print("Category %s count is: %s" %
-          (category, bookCategoryInfo["otherResult"]["count"]))
-    bookList = bookCategoryInfo['module']
-    if not os.path.exists('downloads/'+category):
-        os.makedirs('downloads/'+category)
-    os.chdir('downloads/'+category)
-    for bookInfo in bookList:
-        if isCmpebooks(bookInfo['img']):
-            pdfUrl = genPDFUrl(bookInfo['img'])
-            pdfName = cleanFileName(bookInfo['name']+".pdf")
-            print('Download:', pdfName)
-            downloadPdf(pdfName, pdfUrl)
+    rootPath = os.getcwd()
+    with open("Category.txt", encoding='utf-8')as f:
+        for line in f.readlines():
+            category = line.strip('\n\r\t')
+            categoryCode = category.split(" ")[0]
+            categoryName = cleanFileName(category.split(" ")[1].split("(")[0])
+            categoryCount = category.split(
+                " ")[1].split("(")[1].replace(")", "")
+            print(categoryCode, categoryName, categoryCount)
+            categoryPath = 'downloads/'+categoryCode+categoryName
+            if not os.path.exists(categoryPath):
+                os.makedirs(categoryPath)
+            os.chdir(categoryPath)
+            print("Category %s Download in: %s" %
+                  (category, categoryPath))
+            bookCategoryInfo = getBookCategoryInfo(
+                categoryCode, "1", categoryCount)
+            bookList = bookCategoryInfo['module']
+            for bookInfo in bookList:
+                if isCmpebooks(bookInfo['img']):
+                    pdfUrl = genPDFUrl(bookInfo['img'])
+                    pdfName = cleanFileName(bookInfo['name']+".pdf")
+                    print('Download:', pdfName)
+                    downloadPdf(pdfName, pdfUrl)
+            os.chdir(rootPath)
