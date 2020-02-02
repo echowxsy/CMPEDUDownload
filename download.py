@@ -38,6 +38,8 @@ def main():
     with open("categories.json") as fp:
         catgories = json.load(fp)
     for category_code, category_name in catgories.items():
+        if category_code[0] == "#":
+            continue
         for pdf_link, filename in get_books(category_code):
             saved_path = "downloads/%s-%s/%s" % (category_code, category_name, filename)
             print("%s\n\treferer=%s\n\tout=%s" % (pdf_link, referer, saved_path))
