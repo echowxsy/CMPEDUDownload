@@ -145,6 +145,8 @@ if __name__ == "__main__":
     rootPath = os.getcwd()
     with open("Category.txt", encoding='utf-8')as f:
         for line in f.readlines():
+            if line[0]=="#":
+                continue
             category = line.strip('\n\r\t')
             categoryCode = category.split(" ")[0]
             categoryName = cleanFileName(category.split(" ")[1].split("(")[0])
