@@ -8,10 +8,15 @@ referer = "https://cmpebooks.s3.cn-north-1.amazonaws.com.cn/pdfReader/generic/bu
 
 
 def get_books(code: str):
-    response = requests.post(
-        "http://ebooks.cmanuf.com/getBookCategoryInfo",
-        data={"code": code, "page": 1, "limit": 1000, "px": "desc"},
-    )
+    try:
+        response = requests.post(
+            "http://ebooks.cmanuf.com/getBookCategoryInfo",
+            data={"code": code, "page": 1, "limit": 1000, "px": "desc"},
+            timeout=15
+        )
+    except requests.exceptions.RequestException:
+        print("Request timeout")
+        exit(0)
     books = response.json()["module"]
     for bookInfo in books:
         cover = bookInfo["img"]
@@ -38,14 +43,17 @@ def get_books(code: str):
 
 def main():
     catgories = {}
-    with open("categories.json",encoding='utf-8') as fp:
+    with open("categories.json", encoding='utf-8') as fp:
         catgories = json.load(fp)
+        fp.close()
     for category_code, category_name in catgories.items():
         if category_code[0] == "#":
             continue
         for pdf_link, filename in get_books(category_code):
-            saved_path = "downloads/%s-%s/%s" % (category_code, category_name, filename)
-            print("%s\n\treferer=%s\n\tout=%s" % (pdf_link, referer, saved_path))
+            saved_path = "downloads/%s-%s/%s" % (
+                category_code, category_name, filename)
+            print("%s\n\treferer=%s\n\tout=%s" %
+                  (pdf_link, referer, saved_path))
 
 
 if __name__ == "__main__":
