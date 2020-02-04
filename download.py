@@ -19,8 +19,11 @@ def get_books(code: str):
             continue
         pdf_link = (
             cover.replace("/Cover/", "/PDF/")
+            .replace("/cover/", "/pdf/")
             .replace("Cover1.jpg", "2.pdf")
             .replace("Cover2.jpg", "2.pdf")
+            .replace("Cover2.JPG", "2.pdf")
+            .replace("cover_front.jpg", "L.pdf")
             .replace("cover_front_L.jpg", "L.pdf")
         )
         filename = (
