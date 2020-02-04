@@ -4,7 +4,8 @@
 
 ## 使用方法
 
-如果你想下载，可以直接使用 `downloads.txt` ，如果你想自己抓去地址，请参考以下命令：
+如果你想下载，可以直接使用 `downloads.txt` 。
+如果你想自己抓取地址，请参考以下命令：
 
 ```bash
 pip3 install requests
