@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 # coding=utf-8
 import json
-
 import requests
 
+# 定义常量
 referer = "https://cmpebooks.s3.cn-north-1.amazonaws.com.cn/pdfReader/generic/build/pdf.worker.js"
+catgories_filename = "categories.json"
+downloads_filename = "downloads.txt"
 
 
 def get_books(code: str):
@@ -15,9 +17,15 @@ def get_books(code: str):
             timeout=15
         )
     except requests.exceptions.RequestException:
-        print("Request timeout")
+        print("[ERR] request timeout")
         exit(0)
-    books = response.json()["module"]
+    try:
+        books = response.json()["module"]
+    except json.decoder.JSONDecodeError:
+        print("[ERR] response can not json decode")
+        print(response.content)
+        exit(0)
+
     for bookInfo in books:
         cover = bookInfo["img"]
         if len(cover) <= 55 or "cmpebooks.s3.cn-north-1.amazonaws.com.cn" not in cover:
@@ -41,11 +49,32 @@ def get_books(code: str):
         yield pdf_link, "%s.pdf" % filename
 
 
-def main():
+def get_catgories(filename: str):
     catgories = {}
-    with open("categories.json", encoding='utf-8') as fp:
-        catgories = json.load(fp)
-        fp.close()
+    f = None
+    try:
+        f = open(filename, 'r', encoding='utf-8')
+        catgories = json.load(f)
+    except FileNotFoundError:
+        print("[ERR] %s not found" % (filename))
+        exit(0)
+    except LookupError:
+        print("[ERR] %s encoding is not utf-8" % (filename))
+        exit(0)
+    except UnicodeDecodeError:
+        print("[ERR] can not decode %s" % (filename))
+        exit(0)
+    except json.decoder.JSONDecodeError:
+        print("[ERR] can not decode %s as a json file" % (filename))
+        exit(0)
+    finally:
+        if f:
+            f.close()
+    return catgories
+
+
+def main():
+    catgories = get_catgories(catgories_filename)
     for category_code, category_name in catgories.items():
         if category_code[0] == "#":
             continue
